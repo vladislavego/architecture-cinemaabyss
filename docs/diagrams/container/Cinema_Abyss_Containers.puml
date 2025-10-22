@@ -16,7 +16,7 @@ System_Boundary(cinema, "Cinema Abyss System") {
   together {
     Container(userService, "User Service", "Kotlin + gRPC + PostgreSQL", "Manages users, authentication, and profiles")
     Container(movieService, "Movies Service", "Java + gRPC + PostgreSQL", "Movie catalog. Stores movie metadata.")
-    Container(subscriptionService, "Subscription Service", "Go + gRPC + PostgreSQL", "Manages subscriptions")
+    Container(subscriptionService, "Subscription Service", "Kotlin + gRPC + PostgreSQL", "Manages subscriptions")
     Container(paymentService, "Payment Service", "Go + gRPC + PostgreSQL", "Handles transactions and billing integration")
     Container(favoritesService, "Favorites Service", "Python + gRPC + PostgreSQL", "Stores user favorites, likes, and ratings")
   }

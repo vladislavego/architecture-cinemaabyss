@@ -1,0 +1,73 @@
+@startuml CinemaAbyss_Containers_ToBe_Final_Clean
+!define C4P https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master
+!includeurl C4P/C4_Context.puml
+!includeurl C4P/C4_Container.puml
+
+Person(user, "User", "Cinema Abyss viewer who watches, rates, and interacts across devices")
+
+System_Boundary(cinema, "Cinema Abyss System") {
+
+  Container(webApp, "Web App", "React + TypeScript", "Browser client for streaming and account management")
+  Container(mobileApp, "Mobile App", "Kotlin / Swift", "Mobile client for Android/iOS")
+  Container(tvApp, "Smart TV App", "Tizen / WebOS", "TV interface for browsing and playback")
+
+  Container(apiGateway, "API Gateway / BFF", "Kotlin + Spring Boot", "Unified entry point. Routes REST calls to gRPC microservices and aggregates data for specific client apps (Web, Mobile, TV).")
+
+  together {
+    Container(userService, "User Service", "Kotlin + gRPC + PostgreSQL", "Manages users, authentication, and profiles")
+    Container(movieService, "Movies Service", "Java + gRPC + PostgreSQL", "Movie catalog. Stores movie metadata.")
+    Container(subscriptionService, "Subscription Service", "Go + gRPC + PostgreSQL", "Manages subscriptions")
+    Container(paymentService, "Payment Service", "Go + gRPC + PostgreSQL", "Handles transactions and billing integration")
+    Container(favoritesService, "Favorites Service", "Python + gRPC + PostgreSQL", "Stores user favorites, likes, and ratings")
+  }
+
+  Container(kafka, "Kafka", "Event Bus", "Internal async communication")
+
+  together {
+    ContainerDb(userDb, "User DB", "PostgreSQL", "User accounts and settings")
+    ContainerDb(movieDb, "Movies DB", "PostgreSQL", "Movies metadata")
+    ContainerDb(subscriptionDb, "Subscription DB", "PostgreSQL", "Subscriptions")
+    ContainerDb(paymentDb, "Payment DB", "PostgreSQL", "Transactions and billing data")
+    ContainerDb(favoritesDb, "Favorites DB", "PostgreSQL", "User ratings, likes, and favorites")
+  }
+}
+
+System_Ext(mediaStorage, "Media Storage (S3/CDN)",  "Stores media content")
+System_Ext(recoEngine, "Recommendation Engine",  "Generates personalized recommendations")
+System_Ext(recoKafka, "Recommendation Kafka", "Event bus owned by the recommendation engine")
+
+Rel(user, webApp, "Uses via browser", "HTTPS / REST")
+Rel(user, mobileApp, "Uses via mobile app", "HTTPS / REST")
+Rel(user, tvApp, "Uses via TV app", "HTTPS / REST")
+
+Rel(webApp, apiGateway, "Calls API", "HTTPS / REST")
+Rel(mobileApp, apiGateway, "Calls API", "HTTPS / REST")
+Rel(tvApp, apiGateway, "Calls API", "HTTPS / REST")
+
+Rel(apiGateway, userService, "Routes requests", "gRPC / Protobuf")
+Rel(apiGateway, movieService, "Routes requests", "gRPC / Protobuf")
+Rel(apiGateway, subscriptionService, "Routes requests", "gRPC / Protobuf")
+Rel(apiGateway, paymentService, "Routes requests", "gRPC / Protobuf")
+Rel(apiGateway, favoritesService, "Routes requests", "gRPC / Protobuf")
+
+Rel(userService, userDb, "Reads/Writes", "SQL")
+Rel(movieService, movieDb, "Reads/Writes", "SQL")
+Rel(subscriptionService, subscriptionDb, "Reads/Writes", "SQL")
+Rel(paymentService, paymentDb, "Reads/Writes", "SQL")
+Rel(favoritesService, favoritesDb, "Reads/Writes", "SQL")
+
+Rel(movieService, kafka, "Publishes movie catalog updates", "Kafka / Protobuf")
+Rel(kafka, favoritesService, "Delivers movie catalog updates", "Kafka / Protobuf")
+
+Rel(paymentService, kafka, "Publishes payment events", "Kafka / Protobuf")
+Rel(kafka, subscriptionService, "Delivers payment events", "Kafka / Protobuf")
+
+Rel(subscriptionService, kafka, "Publishes subscription events", "Kafka / Protobuf")
+Rel(kafka, movieService, "Delivers subscription events", "Kafka / Protobuf")
+
+Rel(movieService, mediaStorage, "Retrieves signed URLs for playback", "HTTPS / S3 API")
+Rel(favoritesService, recoKafka, "Publishes user likes, ratings, and favorites events", "Kafka / Protobuf (external)")
+Rel(movieService, recoKafka, "Publishes catalog updates", "Kafka / Protobuf (external)")
+Rel(movieService, recoEngine, "Requests recommendations by userId", "REST / JSON")
+
+@enduml

@@ -8,11 +8,18 @@ import org.springframework.web.reactive.function.client.WebClient
 @Configuration
 class WebClientConfig(
     @Value("\${MOVIES_SERVICE_URL}") private val moviesUrl: String,
-    @Value("\${MONOLITH_URL}") private val legacyUrl: String
+    @Value("\${MONOLITH_URL}") private val legacyUrl: String,
+    @Value("\${EVENTS_SERVICE_URL}") private val eventsUrl: String
 ) {
     @Bean
-    fun moviesClient(): WebClient = WebClient.builder().baseUrl(moviesUrl).build()
+    fun moviesClient(): WebClient =
+        WebClient.builder().baseUrl(moviesUrl).build()
 
     @Bean
-    fun legacyClient(): WebClient = WebClient.builder().baseUrl(legacyUrl).build()
+    fun legacyClient(): WebClient =
+        WebClient.builder().baseUrl(legacyUrl).build()
+
+    @Bean
+    fun eventsClient(): WebClient =
+        WebClient.builder().baseUrl(eventsUrl).build()
 }

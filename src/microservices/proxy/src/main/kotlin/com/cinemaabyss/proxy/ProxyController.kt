@@ -1,6 +1,7 @@
 package com.cinemaabyss.proxy.controller
 
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.reactive.function.client.WebClient
@@ -41,6 +42,7 @@ class ProxyController(
     fun createMovie(@RequestBody body: String): Mono<ResponseEntity<String>> {
         println("Routing POST $MOVIES_PATH to LEGACY service")
         return legacyClient.post().uri(MOVIES_PATH)
+            .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(body)
             .retrieve()
             .bodyToMono(String::class.java)
@@ -60,6 +62,7 @@ class ProxyController(
     fun createUser(@RequestBody body: String): Mono<ResponseEntity<String>> {
         println("Routing POST $USERS_PATH to LEGACY service")
         return legacyClient.post().uri(USERS_PATH)
+            .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(body)
             .retrieve()
             .bodyToMono(String::class.java)
@@ -79,6 +82,7 @@ class ProxyController(
     fun createPayment(@RequestBody body: String): Mono<ResponseEntity<String>> {
         println("Routing POST $PAYMENTS_PATH to LEGACY service")
         return legacyClient.post().uri(PAYMENTS_PATH)
+            .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(body)
             .retrieve()
             .bodyToMono(String::class.java)
@@ -98,6 +102,7 @@ class ProxyController(
     fun createSubscription(@RequestBody body: String): Mono<ResponseEntity<String>> {
         println("Routing POST $SUBSCRIPTIONS_PATH to LEGACY service")
         return legacyClient.post().uri(SUBSCRIPTIONS_PATH)
+            .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(body)
             .retrieve()
             .bodyToMono(String::class.java)
@@ -107,7 +112,9 @@ class ProxyController(
     @PostMapping("/events/{type}")
     fun createEvent(@PathVariable type: String, @RequestBody body: String): Mono<ResponseEntity<String>> {
         println("Routing POST $EVENTS_PATH/$type to EVENTS service")
-        return eventsClient.post().uri("$EVENTS_PATH/$type")
+        return eventsClient.post()
+            .uri("$EVENTS_PATH/$type")
+            .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(body)
             .retrieve()
             .bodyToMono(String::class.java)

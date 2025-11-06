@@ -18,3 +18,11 @@ spec:
                 name: proxy-service
                 port:
                   number: 8000
+
+          - path: /health
+            pathType: Prefix
+            backend:
+              service:
+                name: proxy-service
+                port:
+                  number: 8000

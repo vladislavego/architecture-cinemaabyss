@@ -26,13 +26,18 @@ class ProxyController(
     }
 
     @GetMapping("/movies")
-    fun getMovies(): Mono<ResponseEntity<String>> {
+    fun getMovies(@RequestParam(required = false) id: Int?): Mono<ResponseEntity<String>> {
         val routeToNew = Random.nextInt(100) < migrationPercent
         val client = if (routeToNew) moviesClient else legacyClient
         val target = if (routeToNew) "NEW" else "LEGACY"
         println("Routing GET $MOVIES_PATH to $target service (migrationPercent=$migrationPercent%)")
 
-        return client.get().uri(MOVIES_PATH)
+        return client.get()
+            .uri { uriBuilder ->
+                val builder = uriBuilder.path(MOVIES_PATH)
+                if (id != null) builder.queryParam("id", id)
+                builder.build()
+            }
             .retrieve()
             .bodyToMono(String::class.java)
             .map { ResponseEntity.ok(it) }
@@ -41,7 +46,8 @@ class ProxyController(
     @PostMapping("/movies")
     fun createMovie(@RequestBody body: String): Mono<ResponseEntity<String>> {
         println("Routing POST $MOVIES_PATH to LEGACY service")
-        return legacyClient.post().uri(MOVIES_PATH)
+        return legacyClient.post()
+            .uri(MOVIES_PATH)
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(body)
             .retrieve()
@@ -50,9 +56,15 @@ class ProxyController(
     }
 
     @GetMapping("/users")
-    fun getUsers(): Mono<ResponseEntity<String>> {
+    fun getUsers(@RequestParam(required = false) id: Int?): Mono<ResponseEntity<String>> {
         println("Routing GET $USERS_PATH to LEGACY service")
-        return legacyClient.get().uri(USERS_PATH)
+
+        return legacyClient.get()
+            .uri { uriBuilder ->
+                val builder = uriBuilder.path(USERS_PATH)
+                if (id != null) builder.queryParam("id", id)
+                builder.build()
+            }
             .retrieve()
             .bodyToMono(String::class.java)
             .map { ResponseEntity.ok(it) }
@@ -61,7 +73,8 @@ class ProxyController(
     @PostMapping("/users")
     fun createUser(@RequestBody body: String): Mono<ResponseEntity<String>> {
         println("Routing POST $USERS_PATH to LEGACY service")
-        return legacyClient.post().uri(USERS_PATH)
+        return legacyClient.post()
+            .uri(USERS_PATH)
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(body)
             .retrieve()
@@ -70,9 +83,19 @@ class ProxyController(
     }
 
     @GetMapping("/payments")
-    fun getPayments(): Mono<ResponseEntity<String>> {
+    fun getPayments(
+        @RequestParam(required = false) id: Int?,
+        @RequestParam(required = false, name = "user_id") userId: Int?
+    ): Mono<ResponseEntity<String>> {
         println("Routing GET $PAYMENTS_PATH to LEGACY service")
-        return legacyClient.get().uri(PAYMENTS_PATH)
+
+        return legacyClient.get()
+            .uri { uriBuilder ->
+                val builder = uriBuilder.path(PAYMENTS_PATH)
+                if (id != null) builder.queryParam("id", id)
+                if (userId != null) builder.queryParam("user_id", userId)
+                builder.build()
+            }
             .retrieve()
             .bodyToMono(String::class.java)
             .map { ResponseEntity.ok(it) }
@@ -81,7 +104,8 @@ class ProxyController(
     @PostMapping("/payments")
     fun createPayment(@RequestBody body: String): Mono<ResponseEntity<String>> {
         println("Routing POST $PAYMENTS_PATH to LEGACY service")
-        return legacyClient.post().uri(PAYMENTS_PATH)
+        return legacyClient.post()
+            .uri(PAYMENTS_PATH)
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(body)
             .retrieve()
@@ -90,9 +114,19 @@ class ProxyController(
     }
 
     @GetMapping("/subscriptions")
-    fun getSubscriptions(): Mono<ResponseEntity<String>> {
+    fun getSubscriptions(
+        @RequestParam(required = false) id: Int?,
+        @RequestParam(required = false, name = "user_id") userId: Int?
+    ): Mono<ResponseEntity<String>> {
         println("Routing GET $SUBSCRIPTIONS_PATH to LEGACY service")
-        return legacyClient.get().uri(SUBSCRIPTIONS_PATH)
+
+        return legacyClient.get()
+            .uri { uriBuilder ->
+                val builder = uriBuilder.path(SUBSCRIPTIONS_PATH)
+                if (id != null) builder.queryParam("id", id)
+                if (userId != null) builder.queryParam("user_id", userId)
+                builder.build()
+            }
             .retrieve()
             .bodyToMono(String::class.java)
             .map { ResponseEntity.ok(it) }
@@ -101,7 +135,8 @@ class ProxyController(
     @PostMapping("/subscriptions")
     fun createSubscription(@RequestBody body: String): Mono<ResponseEntity<String>> {
         println("Routing POST $SUBSCRIPTIONS_PATH to LEGACY service")
-        return legacyClient.post().uri(SUBSCRIPTIONS_PATH)
+        return legacyClient.post()
+            .uri(SUBSCRIPTIONS_PATH)
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(body)
             .retrieve()

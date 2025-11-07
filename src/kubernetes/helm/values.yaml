@@ -5,7 +5,7 @@ global:
 
 # Image pull secrets
 imagePullSecrets:
-  dockerconfigjson: ewoJImF1dGhzIjogewoJCSJnaGNyLmlvIjogewoJCQkiYXV0aCI6
+  dockerconfigjson: ewoJImF1dGhzIjogewoJCSJnaGNyLmlvIjogewoJCQkiYXV0aCI6ICJkbXhoWkdsemJHRjJaV2R2T21kb2NGOWxkRlUzY2pZNFRHRkJlalp2TkRGdlpUbHJjR3hZYXpOWE5HeG1iVzh5T0hoeGFVVT0iCgkJfSwKCQkicmVnaXN0cnkueWFuZGV4Lm5ldCI6IHsKCQkJImF1dGgiOiAiZG14aFpHbHpiR0YyWldkdk9rRlJRVVF0Y1VwVFN6VjFaRUZCUVVWRFJVSlJXVVZTYm5Jd1ptdHNUR1EyZDBOcVF6VndTUT09IgoJCX0KCX0sCgkiY3VycmVudENvbnRleHQiOiAiY29saW1hIgp9
 # Database configuration
 database:
   host: postgres
@@ -33,7 +33,7 @@ database:
 monolith:
   enabled: true
   image:
-    repository: ghcr.io/db-exp/cinemaabysstest/monolith
+    repository: ghcr.io/vladislavego/architecture-cinemaabyss/monolith
     tag: latest
     pullPolicy: Always
   replicas: 1
@@ -53,7 +53,7 @@ monolith:
 proxyService:
   enabled: true
   image:
-    repository: ghcr.io/db-exp/cinemaabysstest/proxy-service
+    repository: ghcr.io/vladislavego/architecture-cinemaabyss/proxy-service
     tag: latest
     pullPolicy: Always
   replicas: 1
@@ -73,7 +73,7 @@ proxyService:
 moviesService:
   enabled: true
   image:
-    repository: ghcr.io/db-exp/cinemaabysstest/movies-service
+    repository: ghcr.io/vladislavego/architecture-cinemaabyss/movies-service
     tag: latest
     pullPolicy: Always
   replicas: 1
@@ -93,7 +93,7 @@ moviesService:
 eventsService:
   enabled: true
   image:
-    repository: ghcr.io/db-exp/cinemaabysstest/events-service
+    repository: ghcr.io/vladislavego/architecture-cinemaabyss/events-service
     tag: latest
     pullPolicy: Always
   replicas: 1
@@ -120,10 +120,10 @@ kafka:
   resources:
     limits:
       cpu: 1000m
-      memory: 1Gi
+      memory: 2Gi
     requests:
-      cpu: 200m
-      memory: 512Mi
+      cpu: 500m
+      memory: 1Gi
   persistence:
     enabled: true
     size: 5Gi
@@ -173,10 +173,6 @@ ingress:
           pathType: Prefix
           service: proxy-service
           port: 80
-        - path: /api/events
-          pathType: Prefix
-          service: events-service
-          port: 8082
 
 # Application configuration
 config:
